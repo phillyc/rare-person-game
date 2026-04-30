@@ -3,9 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
+    <title>You Don't Have It</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            min-height: calc(100vh - 60px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
-    Loading rare person game...
+    <header>
+        <h1>You don't have it</h1>
+    </header>
+
+    <div class="container" id="container">
+        <!-- Infinite rows will be dynamically added here -->
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 id="modalTitle"></h2>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const container = document.getElementById('container');
+
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalOverlay.classList.add('active');
+        }
+
+        function hideModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', hideModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                hideModal();
+            }
+        });
+
+        // Generate random rows for infinite scroll effect
+        function createRow() {
+            const row = document.createElement('div');
+            row.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                font-size: 1.25rem;
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+            `;
+            row.textContent = Math.floor(Math.random() * 1000);
+            row.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (Math.random() < 0.01) {
+                    // 1% chance to trigger modal
+                    showModal('Rare Person Found!', 'Congratulations! You found someone rare.');
+                }
+            });
+            return row;
+        }
+
+        // Load initial rows
+        for (let i = 0; i < 20; i++) {
+            container.appendChild(createRow());
+        }
+
+        // Infinite scroll loading
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                // Add more rows when near bottom
+                for (let i = 0; i < 10; i++) {
+                    container.appendChild(createRow());
+                }
+            }
+        });
+    </script>
 </body>
 </html>
